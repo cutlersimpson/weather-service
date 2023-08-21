@@ -1,0 +1,29 @@
+version: "3.2"
+
+networks:
+  weather-service-network:
+
+services:
+  weather-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 5001:5001
+    networks:
+      - weather-service-network
+    healthcheck:
+      test: ["CMD", "curl", "http://localhost:5001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  weather-service-test:
+    build:
+      context: ./tests
+      dockerfile: Dockerfile
+    restart: on-failure
+    depends_on:
+      - weather-service
+    networks:
+      - weather-service-network
